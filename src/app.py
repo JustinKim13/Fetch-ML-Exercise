@@ -53,7 +53,6 @@ def load_model_and_predict():
 
     return adjusted_predicted_receipts[:12], monthly_data  # Return the first 12 months of 2022 predictions and actual data for 2021
 
-# Call the function to load predictions
 predicted_receipts_2022, actual_receipts_2021 = load_model_and_predict()
 
 @app.route('/')
@@ -69,14 +68,19 @@ def predict():
         return jsonify({'error': 'Valid month (1-12) is required'}), 400
     
     predicted_receipt = predicted_receipts_2022[month - 1]
+    predicted_receipt_rounded = round(float(predicted_receipt), 2)
     return jsonify({
         'month': month,
-        'predicted_receipts': float(predicted_receipt)
+        'predicted_receipts': predicted_receipt_rounded
     })
 
 @app.route('/plot', methods=['GET'])
 def plot_receipts():
     highlight_month = request.args.get('month', default=None, type=int)
+
+    months_labels = [
+        f"2021/{i}" for i in range(1, 13)
+    ] + [f"2022/{i}" for i in range(1, 13)]
 
     plt.figure(figsize=(10, 6))
     plt.plot(range(1, len(actual_receipts_2021) + 1), actual_receipts_2021.values, label='Actual Receipts (2021)', marker='o', color='blue')
@@ -85,10 +89,13 @@ def plot_receipts():
     if highlight_month is not None and 1 <= highlight_month <= 12:
         plt.scatter([len(actual_receipts_2021) + highlight_month], [predicted_receipts_2022[highlight_month - 1]],
                     color='green', s=100, label=f'Highlighted Month {highlight_month}')
-
+    
     plt.title('Actual 2021 vs Predicted 2022 Monthly Receipts')
     plt.xlabel('Month')
     plt.ylabel('Receipt Count')
+
+    plt.xticks(ticks=range(1, len(months_labels) + 1), labels=months_labels, rotation=45)
+
     plt.grid(True)
     plt.legend()
 

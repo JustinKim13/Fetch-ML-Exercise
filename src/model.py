@@ -10,13 +10,10 @@ class LSTMModel(nn.Module):
         self.hidden_size = hidden_size
 
     def forward(self, x):
-        # Initialize hidden state and cell state
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
         c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
-
         # LSTM forward pass
         out, _ = self.lstm(x, (h0, c0))
-
         # Only take the last output
         out = self.fc(out[:, -1, :])
         return out
