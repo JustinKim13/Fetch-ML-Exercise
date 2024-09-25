@@ -1,13 +1,16 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 import torch
 import numpy as np
-from model import LSTMModel
-from preprocess import custom_inverse_scale, min_receipts, max_receipts
 import pandas as pd
+from model import LSTMModel
+from preprocess import custom_inverse_scale
+import io
+import matplotlib.pyplot as plt
 
-app = Flask(__name__)
+# Initialize Flask app with correct static and template directories
+app = Flask(__name__, static_folder='static', template_folder='templates')
 
-# Load the trained model and the necessary data used for training
+# Load and predict the receipts data (same as before)
 def load_model_and_predict():
     # Load data and model used during training
     data = pd.read_csv('/app/data/data_daily.csv', parse_dates=['# Date'], index_col='# Date')
@@ -28,7 +31,7 @@ def load_model_and_predict():
     # Prepare input for 2022 predictions (months 13-24)
     months_input = np.array([[i] for i in range(len(scaled_monthly_data) + 1, len(scaled_monthly_data) + 13)])  # Months 13 to 24
 
-    # Load model
+    # Load the model
     model_path = 'model.pth'
     model = LSTMModel(input_size=1, hidden_size=1000, output_size=1, num_layers=2)
     model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
@@ -48,26 +51,53 @@ def load_model_and_predict():
     shift = last_actual_2021 - first_predicted_2022
     adjusted_predicted_receipts = predicted_receipts + shift
 
-    return adjusted_predicted_receipts[:12]  # Return the first 12 months of 2022 predictions
+    return adjusted_predicted_receipts[:12], monthly_data  # Return the first 12 months of 2022 predictions and actual data for 2021
 
-# Load the predictions once when the app starts
-predicted_receipts_2022 = load_model_and_predict()
+# Call the function to load predictions
+predicted_receipts_2022, actual_receipts_2021 = load_model_and_predict()
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.get_json(force=True)
+    data = request.get_json()
     month = data.get('month')
-
+    
     if month is None or month < 1 or month > 12:
         return jsonify({'error': 'Valid month (1-12) is required'}), 400
-
-    # Return the predicted receipt for the requested month
+    
     predicted_receipt = predicted_receipts_2022[month - 1]
-
     return jsonify({
         'month': month,
         'predicted_receipts': float(predicted_receipt)
     })
+
+@app.route('/plot', methods=['GET'])
+def plot_receipts():
+    highlight_month = request.args.get('month', default=None, type=int)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, len(actual_receipts_2021) + 1), actual_receipts_2021.values, label='Actual Receipts (2021)', marker='o', color='blue')
+    plt.plot(range(len(actual_receipts_2021) + 1, len(actual_receipts_2021) + 13), predicted_receipts_2022, label='Predicted Receipts (2022)', marker='x', color='red')
+
+    if highlight_month is not None and 1 <= highlight_month <= 12:
+        plt.scatter([len(actual_receipts_2021) + highlight_month], [predicted_receipts_2022[highlight_month - 1]],
+                    color='green', s=100, label=f'Highlighted Month {highlight_month}')
+
+    plt.title('Actual 2021 vs Predicted 2022 Monthly Receipts')
+    plt.xlabel('Month')
+    plt.ylabel('Receipt Count')
+    plt.grid(True)
+    plt.legend()
+
+    # Save plot to a BytesIO object for sending via Flask
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    
+    return send_file(buf, mimetype='image/png')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

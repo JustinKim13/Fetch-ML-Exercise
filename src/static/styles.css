@@ -1,0 +1,25 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 20px;
+}
+
+h1 {
+    color: #333;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+#result {
+    font-size: 1.2em;
+    margin-top: 20px;
+    color: green;
+}
+
+img {
+    max-width: 80%;
+    height: auto;
+    margin-top: 20px;
+}
