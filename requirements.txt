@@ -1,0 +1,7 @@
+Flask==2.1.2
+Werkzeug==2.1.0
+torch==1.10.1
+pandas==1.5.3  # Downgrade pandas to a compatible version
+numpy<2.0.0  # Pin NumPy below version 2.0
+matplotlib  # To allow visualizations later
+scikit-learn
