@@ -7,10 +7,8 @@ from preprocess import custom_inverse_scale
 import io
 import matplotlib.pyplot as plt
 
-# Initialize Flask app with correct static and template directories
-app = Flask(__name__, static_folder='static', template_folder='templates')
+app = Flask(__name__, static_folder='static', template_folder='templates') # give our static and template folders for simple frontend
 
-# Load and predict the receipts data (same as before)
 def load_model_and_predict():
     # Load data and model used during training
     data = pd.read_csv('/app/data/data_daily.csv', parse_dates=['# Date'], index_col='# Date')
@@ -28,7 +26,6 @@ def load_model_and_predict():
 
     scaled_monthly_data = custom_scale(monthly_data.values, min_val, max_val)
 
-    # Prepare input for 2022 predictions (months 13-24)
     months_input = np.array([[i] for i in range(len(scaled_monthly_data) + 1, len(scaled_monthly_data) + 13)])  # Months 13 to 24
 
     # Load the model

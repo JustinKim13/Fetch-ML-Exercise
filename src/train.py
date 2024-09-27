@@ -148,26 +148,23 @@ shift = last_actual_2021 - first_predicted_2022
 # Adjust all the predicted values for 2022 by adding the shift
 adjusted_predicted_receipts = predicted_receipts + shift
 
-# Visualization: Actual 2021 vs Adjusted Predicted 2022 Monthly Receipts
+# Actual 2021 vs Adjusted Predicted 2022 Monthly Receipts Graph
 plt.figure(figsize=(10, 6))
 plt.plot(range(1, len(monthly_data) + 1), monthly_data.values, label='Actual Receipts (2021)', marker='o', color='blue')
 plt.plot(range(len(monthly_data) + 1, len(monthly_data) + 13), adjusted_predicted_receipts, label='Predicted Receipts (2022)', marker='x', color='red')
 plt.title('Actual 2021 vs Adjusted Predicted 2022 Monthly Receipts')
 plt.xlabel('Month')
 plt.ylabel('Receipt Count')
-plt.grid(True)
 plt.legend()
 
 # Save the figure instead of displaying it
 plt.savefig('adjusted_predicted_vs_actual_receipts_2021_2022.png')
 
-print("Graph saved as 'adjusted_predicted_vs_actual_receipts_2021_2022.png'")
-
 # Predict for the entire year of 2022 (months 13 to 24)
-months_2022 = list(range(1, 13))  # Months 1 to 12 for 2022
+months_2022 = list(range(1, 13))  
 predicted_receipts_2022 = adjusted_predicted_receipts[:12]  # Get the first 12 predicted months of 2022
 
-# Print the predicted monthly receipts for each month of 2022
+# Print the predicted monthly receipts for each month of 2022 (for reference in graph created)
 for month, predicted_receipt in zip(months_2022, predicted_receipts_2022):
     predicted_receipt_value = predicted_receipt.item()  # Convert array to scalar
-    print(f"Month {month} of 2022: Predicted Receipts = {predicted_receipt_value:.2f}")# Use Python 3.9 slim as the base image
+    print(f"Month {month} of 2022: Predicted Receipts = {predicted_receipt_value:.2f}")

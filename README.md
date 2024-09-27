@@ -9,6 +9,7 @@ This project is aimed at predicting the number of monthly receipts scanned in 20
 - Pandas
 - Matplotlib
 - Flask
+- Scikit-learn 
 
 ## Installation
 1. Clone the repository:
@@ -28,7 +29,7 @@ This project is aimed at predicting the number of monthly receipts scanned in 20
 To run the web application:
 1. Build the Docker image:
    ```bash
-   docker build -t fetch-ml-exercise .
+   docker build -t fetch-ml-exercise .  
    ```
 2. Run the Docker container:
    ```bash
@@ -48,9 +49,9 @@ You can enter a month (1-12) to see the predicted receipts for that month.
 - `data/data_daily.csv`: Historical data of daily receipts for 2021.
 
 ## Model Overview
-The LSTM model is used to predict the number of monthly receipts for 2022 based on past data from 2021. The key steps involved are:
-1. **Data Resampling**: The daily receipt data is resampled to monthly sums.
-2. **Data Scaling**: The data is scaled between 0 and 1 to make training more stable.
-3. **LSTM Model**: A 2-layer LSTM model is trained on the monthly data.
-4. **Prediction**: The model predicts the next 12 months of receipts (2022), and the predictions are scaled back to the original range.
-5. **Adjustment**: Predictions are adjusted to ensure continuity with the actual data from 2021.
+I used an LSTM model to predict monthly receipt totals for 2022, drawing from 2021's data. Here are the key steps:
+1. **Data Resampling**: I resampled daily data into monthly totals to better capture long-term trends.
+2. **Data Scaling**: To ensure the model trained smoothly, I scaled the data between 0 and 1.
+3. **LSTM Model**:  I designed a 2-layer LSTM model, tuned hyperparameters like hidden layers and learning rates, and employed early stopping to avoid overfitting.
+4. **Prediction**: The model generates receipt forecasts for the next 12 months, which are then inverse-scaled back to the original range.
+5. **Adjustment**: To ensure continuity, I adjusted the model’s predictions to match the last known data point from 2021.
