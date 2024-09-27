@@ -14,7 +14,7 @@ This project is aimed at predicting the number of monthly receipts scanned in 20
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/fetch-ml-exercise.git
+   git clone [https://github.com/your-repo/fetch-ml-exercise.git](https://github.com/JustinKim13/Fetch-ML-Exercise.git)
    ``````
 2. Navigate to the project directory:
    ```bash
