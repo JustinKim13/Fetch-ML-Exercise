@@ -37,7 +37,7 @@ To run the web application:
    ```
 3. Open your browser and go to
    ```bash
-   http://localhost:5002`.
+   http://localhost:5002
    ```
 You can enter a month (1-12) to see the predicted receipts for that month.
 
